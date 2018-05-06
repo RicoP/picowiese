@@ -28,17 +28,17 @@ end
 function button_collision_check(button, xoff, yoff)
  if btn(button) then 
   if not is_solid(px + xoff, py + yoff) then
-	  px += xoff
-	  py += yoff
+	  px += xvel
+	  py += yvel
 	 end
  end
 end
 
 function game_update()
- button_collision_check(0, -1, 0)
- button_collision_check(1, 1, 0)
- button_collision_check(2, 0, -1)
- button_collision_check(3, 0, 1)
+ button_collision_check(0, -1,  0, -1,  0)
+ button_collision_check(1,  8,  0,  1,  0)
+ button_collision_check(2,  0, -1,  0, -1)
+ button_collision_check(3,  0,  8,  0,  1)
 end
 
 function game_draw()
