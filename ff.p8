@@ -25,15 +25,20 @@ function draw_background()
  map(0, 0, 0, 0) 
 end
 
-function game_update()
- if btn(0) then 
-  if not is_solid(px - 1, py) then
-	  px -= 1 
+function button_collision_check(button, xoff, yoff)
+ if btn(button) then 
+  if not is_solid(px + xoff, py + yoff) then
+	  px += xoff
+	  py += yoff
 	 end
  end
- if btn(1) then px += 1 end
- if btn(2) then py -= 1 end
- if btn(3) then py += 1 end 
+end
+
+function game_update()
+ button_collision_check(0, -1, 0)
+ button_collision_check(1, 1, 0)
+ button_collision_check(2, 0, -1)
+ button_collision_check(3, 0, 1)
 end
 
 function game_draw()
