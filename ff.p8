@@ -25,7 +25,7 @@ function draw_background()
  map(0, 0, 0, 0) 
 end
 
-function button_collision_check(button, xoff, yoff)
+function button_collision_check(button, xoff, yoff, xvel, yvel)
  if btn(button) then 
   if not is_solid(px + xoff, py + yoff) then
 	  px += xvel
