@@ -26,12 +26,14 @@ function get_tile(x,y,a)
   local tx = flr(x/8)
   local ty = flr(y/8)
   local s = mget(tx,ty)
-  if(s!=0)return s,distance
+  if s!=0 then
+   return s,distance,x%8
+  end
   x+=dx
   y+=dy
   distance+=1
  end
- return 0,0
+ return 0,0,0
 end
 
 function draw_game()
@@ -40,10 +42,10 @@ function draw_game()
  local y=flr(p.x)
  local a = p.angle+p.fov/2
  for i=1,128 do
-  local t,d=get_tile(p.x,p.y,a)
+  local t,d,px=get_tile(p.x,p.y,a)
   a-=p.fov/(128)
   local h = 64/d
-  sspr(t*8,0,1,8,i-1,64-(64-d)/2,1,64-d)
+  sspr(t*8+px,0,1,8,i-1,64-(64-d)/2,1,64-d)
  end
 end
 
