@@ -18,8 +18,31 @@ function rotate(x,y,angle)
  return dx2,dy2
 end
 
+function get_tile(x,y,a)
+ local dx,dy=rotate(1,0,a)
+ -- loop until we find the tile
+ for i=1,1000 do --limit by n steps
+  local tx = flr(x/8)
+  local ty = flr(y/8)
+  local s = mget(tx,ty)
+  if(s!=0)return s
+  x+=dx
+  y+=dy
+ end
+ return 0
+end
+
+function draw_game()
+ camera()
+ local x=flr(p.x)
+ local y=flr(p.x)
+ local t=get_tile(p.x,p.y,p.angle+p.fov/2)
+ spr(t,0,0)
+ local t2=get_tile(p.x,p.y,p.angle-p.fov/2)
+ spr(t2,8,0)
+end
+
 function draw_map()
- cls(0)
  camera(p.x - 64, p.y - 64)
 
  map(0,0, 0,0, 64, 64);
@@ -50,6 +73,8 @@ function _update()
 end
 
 function _draw() 
+ cls(0)
+	draw_game()
  draw_map()
 end
 
