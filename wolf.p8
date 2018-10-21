@@ -42,7 +42,8 @@ function draw_game()
  for i=1,128 do
   local t,d=get_tile(p.x,p.y,a)
   a-=p.fov/(128)
-  sspr(t*8,0,1,64,i-1,64)
+  local h = 64/d
+  sspr(t*8,0,1,8,i-1,64-(64-d)/2,1,64-d)
  end
 end
 
