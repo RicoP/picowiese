@@ -5,29 +5,45 @@ __lua__
 p = {
  x=64,
  y=64,
- angle=0
+ angle=0,
+ speed=1,
+ fov=70/360
 }
+
+function rotate(x,y,angle)
+ -- rotates a 2d vector around zero
+ local a = angle
+ local dx2 = cos(a)*x - sin(a)*y
+ local dy2 = sin(a)*x + cos(a)*y
+ return dx2,dy2
+end
 
 function draw_map()
  cls(0)
  camera(p.x - 64, p.y - 64)
 
  map(0,0, 0,0, 64, 64);
- rectfill(p.x, p.y, p.x+2, p.y+2,8)
+ 
  -- sight ray
  -- by default we look along +x
- local dx = 10
- local dy = 0
+ local dx = 10.5
+ local dy = 0.5
  local a = p.angle
- local dx2 = cos(a)*dx - sin(a)*dy
- local dy2 = sin(a)*dx + cos(a)*dy
- 
+	local dx2,dy2 = rotate(dx,dy,p.angle)
  line(p.x,p.y,p.x+dx2,p.y+dy2,7)
+ rectfill(p.x, p.y, p.x+2, p.y+2,8)
 end
 
 function _update()
  if(btn(⬅️))p.angle+=0.025
  if(btn(➡️))p.angle-=0.025
+ if btn(⬆️) then
+  local dx = p.speed
+  local dy = 0
+  local dx2,dy2 = rotate(dx,dy,p.angle)
+ 	p.x += dx2
+ 	p.y += dy2
+ end
 end
 
 function _draw() 
