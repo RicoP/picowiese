@@ -1,14 +1,16 @@
 pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
+--https://lodev.org/cgtutor/raycasting.html
 --player
 p = {
  x=63.5,
  y=63.5,
  angle=0,
  speed=1,
- fov=70/360
 }
+
+fov=70/360
 
 function rotate(x,y,angle)
  -- rotates a 2d vector around zero
@@ -40,10 +42,10 @@ function draw_game()
  camera()
  local x=flr(p.x)
  local y=flr(p.x)
- local a = p.angle+p.fov/2
+ local a = p.angle+fov/2
  for i=1,128 do
   local t,d,px=get_tile(p.x,p.y,a)
-  a-=p.fov/(128)
+  a-=fov/(128)
   local h = 64/d
   sspr(t*8+px,0,1,8,i-1,64-(64-d)/2,1,64-d)
  end
@@ -58,11 +60,11 @@ function draw_map()
  -- by default we look along +x
  local dx = 100.5
  local dy = 0.5
- local a = p.angle-p.fov/2
+ local a = p.angle-fov/2
  for i=1,2 do
 	 local dx2,dy2 = rotate(dx,dy,a)
   line(p.x,p.y,p.x+dx2,p.y+dy2,7)
-  a = p.angle+p.fov/2
+  a = p.angle+fov/2
  end
  spr(1,p.x-4,p.y-4)
 end
