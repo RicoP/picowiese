@@ -79,8 +79,11 @@ function _update()
  end
 end
 
-function vertline(x,y1,y2,c)
- line(x,y1,x,y2,c)
+function vertline(x,y1,y2,tile,texx)
+ --line(x,y1,x,y2,c)
+ --sspr(t*8+px,0,1,8,i-1,64-(64-d)/2,1,64-d)
+ sspr(tile*8+8-texx-1,0,1,8,x,y1,1,y2-y1)
+ 
 end
 
 function draw_game2()
@@ -141,20 +144,34 @@ function draw_game2()
 		local drawend=lineh/2+64
 		if(drawend>=128)drawend=127
   
-  --fake color
-  local c=hit
-  if(side)c+=8
+  local wallx=0
+  if not side then
+   wallx=p.y+perpwalldist*rayy
+  else
+   wallx=p.x+perpwalldist*rayx
+  end
+  wallx-=flr(wallx)
   
-  vertline(x,drawstart,drawend,c)
+  local texx=flr(wallx*8)
+  if not side and rayx>0 then
+   texx=8-texx-1
+  end
+  if side and rayy<0 then
+   texx=8-texx-1
+  end
+    
+  vertline(x,drawstart,drawend,hit,texx)
   
   a-=fov/(128)
  end 
 end
 
+drawmap=true
 function _draw() 
+ if(btnp(❎))drawmap=not drawmap
  cls(0)
-	draw_game2()
- draw_map()
+	draw_game2()	
+ if(drawmap)draw_map()
 end
 
 
