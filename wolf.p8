@@ -21,15 +21,15 @@ function rotate(x,y,angle)
 end
 
 function get_tile(x,y,a)
- local dx,dy=rotate(1,0,a)
+ local dx,dy=rotate(0.1,0,a)
  local distance=0
  -- loop until we find the tile
  for i=1,1000 do --limit by n steps
-  local tx = flr(x/8)
-  local ty = flr(y/8)
+  local tx = flr(x)
+  local ty = flr(y)
   local s = mget(tx,ty)
   if s!=0 then
-   return s,distance,x%8
+   return s,distance,flr(x*8)%8
   end
   x+=dx
   y+=dy
@@ -42,7 +42,7 @@ function draw_game()
  camera()
  local a = p.angle+fov/2
  for i=1,128 do
-  local t,d,px=get_tile(p.x*8,p.y*8,a)
+  local t,d,px=get_tile(p.x,p.y,a)
   a-=fov/(128)
   local h = 64/d
   sspr(t*8+px,0,1,8,i-1,64-(64-d)/2,1,64-d)
