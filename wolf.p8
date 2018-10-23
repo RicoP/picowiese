@@ -20,35 +20,6 @@ function rotate(x,y,angle)
  return dx2,dy2
 end
 
-function get_tile(x,y,a)
- local dx,dy=rotate(0.1,0,a)
- local distance=0
- -- loop until we find the tile
- for i=1,1000 do --limit by n steps
-  local tx = flr(x)
-  local ty = flr(y)
-  local s = mget(tx,ty)
-  if s!=0 then
-   return s,distance,flr(x*8)%8
-  end
-  x+=dx
-  y+=dy
-  distance+=1
- end
- return 0,0,0
-end
-
-function draw_game()
- camera()
- local a = p.angle+fov/2
- for i=1,128 do
-  local t,d,px=get_tile(p.x,p.y,a)
-  a-=fov/(128)
-  local h = 64/d
-  sspr(t*8+px,0,1,8,i-1,64-(64-d)/2,1,64-d)
- end
-end
-
 function draw_map()
  camera(p.x*8 - 64, p.y*8 - 64)
 
@@ -86,7 +57,7 @@ function vertline(x,y1,y2,tile,texx)
  
 end
 
-function draw_game2()
+function draw_game()
  rectfill(0,0,128,64,12)
  rectfill(0,64,128,128,15)
  camera()
@@ -142,9 +113,9 @@ function draw_game2()
 		
 		local lineh=128/perpwalldist		
 		local drawstart=-lineh/2 + 64
-		if(drawstart<0)drawstart=0
+		--if(drawstart<0)drawstart=0
 		local drawend=lineh/2+64
-		if(drawend>=128)drawend=127
+		--if(drawend>=128)drawend=127
   
   local wallx=0
   if not side then
@@ -171,10 +142,9 @@ end
 drawmap=false
 function _draw() 
  if(btnp(❎))drawmap=not drawmap
-	draw_game2()	
+	draw_game()
  if(drawmap)draw_map()
 end
-
 
 __gfx__
 0000000000000000eeeeeeee45454545bbbbbbbb4444444400000000000000000000000000000000000000000000000000000000000000000000000000000000
