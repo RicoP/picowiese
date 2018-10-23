@@ -58,11 +58,11 @@ function vertline(x,y1,y2,tile,texx)
 end
 
 function draw_game()
+ camera()
  rectfill(0,0,128,64,12)
  rectfill(0,64,128,128,15)
- camera()
  local a = p.angle+fov/2
- for x=1,128 do  
+ for x=0,127 do  
   local camx= -1+2*x/128
   --maybe work with a plane here
   local rayx,rayy=rotate(1,0,a)
