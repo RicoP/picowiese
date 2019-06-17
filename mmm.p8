@@ -101,11 +101,11 @@ function _draw()
  end
 
  --debug
- --line(0, p.groundlevel, 128, p.groundlevel, 7)
- --pset(p.x, p.y, 8)
- --pset(p.x+7, p.y, 8)
- --pset(p.x, p.y+7, 8)
- --pset(p.x+7, p.y+7, 8)
+ line(0, p.groundlevel, 128, p.groundlevel, 7)
+ pset(p.x, p.y, 8)
+ pset(p.x+7, p.y, 8)
+ pset(p.x, p.y+7, 8)
+ pset(p.x+7, p.y+7, 8)
 
  g_frame = g_frame + 1
 end
@@ -146,7 +146,7 @@ function apply_hero_falling()
  end
 end
 
-function apply_hero_jumping2() 
+function apply_hero_jumping()
  if p.jumpvel >= 0 then return end
 
  print("jumping")
@@ -171,36 +171,6 @@ function apply_hero_jumping2()
   --on the ceiling
   p.y = flr(p.y/8)*8
  end
-end
-
-function apply_hero_jumping()
- --jumping
- local y = p.y
- local jumpvel = p.jumpvel
- 
- if btnd(🅾️) and y == p.groundlevel then
-  jumpvel = p_jumpstrength
- end
-
- y -= jumpvel
- jumpvel -= 0.5
-
- if y >= p.groundlevel then
-  y = p.groundlevel
-  jumpvel = 0
- end
- 
- if calc_groundlevel(p.x,y) != p.groundlevel then
-  -- hitting the ceiling but 
-  -- being off by just a little 
-  -- bit. round player position
-  p.y = flr(p.y/8)*8
-  p.jumpvel = 0
-  return
- end
- 
- p.y = y
- p.jumpvel = jumpvel
 end
 
 function apply_hero_movement()
@@ -233,8 +203,7 @@ function hero_movement()
 
  local oldx = p.x
  apply_hero_falling()
- apply_hero_jumping2()
- --apply_hero_jumping() 
+ apply_hero_jumping()
  apply_hero_movement() 
  if oldx == p.x then
   p.state = p_state_stand
