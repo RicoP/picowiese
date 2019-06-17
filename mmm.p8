@@ -96,6 +96,7 @@ function _draw()
  line(0, p.groundlevel, 128, p.groundlevel, 7)
 
  print(p.groundlevel)
+ print(p.x .. " " .. p.y)
  g_frame = g_frame + 1
 end
 
@@ -143,16 +144,16 @@ end
 
 function apply_hero_movement()
  if p.state == p_state_stand then return end
- local p1 = clone(p)
- p1.x += p.direction  
+ local x1 = p.x
+ x1 += p.direction  
 
- local t1 = mget(p1.x/8,p1.y/8)
- if t1 != 0 then return end
+ local tl = mget(x1/8,p.y/8)
+ if tl != 0 then return end
 
- t1 = mget((p1.x+7)/8,p1.y/8)
- if t1 != 0 then return end
+ local tr = mget((x1+7)/8,p.y/8)
+ if tr != 0 then return end
 
- p = p1
+ p.x = x1
 end
 
 function hero_movement()
