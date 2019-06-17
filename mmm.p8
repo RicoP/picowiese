@@ -6,7 +6,7 @@ p_state_stand = 1
 p_state_jump = 2
 p_state_run = 3
 
-p_jumpstrength = 7
+p_jumpstrength = 10
 
 --player
 p = {x = 10, y = 10}
@@ -133,9 +133,7 @@ function apply_hero_falling()
 
  p.y += p.jumpvel
  
- if p.y < p.groundlevel then
-  p.jumpvel += 0.5
- else
+ if p.y >= p.groundlevel then
   p.jumpvel = 0
   p.y = p.groundlevel
  end
@@ -146,12 +144,10 @@ function apply_hero_jumping2()
 
  print("junping")
  
- local y = p.y
- y += p.jumpvel
+ p.y += p.jumpvel
  
  if p.y < p.groundlevel then
   p.jumpvel += 0.5
-  p.y = y
  else
   p.jumpvel = 0
   p.y = p.groundlevel
