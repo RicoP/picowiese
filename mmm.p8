@@ -135,11 +135,10 @@ function apply_hero_jumping()
  end
  
  if calc_groundlevel(p1.x,p1.y) != p.groundlevel then
-  local g0 = calc_groundlevel(p.x,p.y)
-  local g1 = calc_groundlevel(p1.x,p1.y)
-  if g1 - g0 < 8 then
-   p.y = flr(p.y/8)*8
-  end
+  -- hitting the ceiling but 
+  -- being off by just a little 
+  -- bit. round player position
+  p.y = flr(p.y/8)*8
   p.jumpvel = 0
   return
  end
