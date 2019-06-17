@@ -157,7 +157,9 @@ function apply_hero_jumping2()
   y = p.groundlevel
  end 
 
- if calc_groundlevel(p.x,y) == p.groundlevel then
+ local g0 = calc_groundlevel(p.x,y)
+ local g1 = calc_groundlevel(p.x+8,y)
+ if g0 == p.groundlevel or g1 == p.groundlevel then
   p.y = y
  else
   --bonged our head
