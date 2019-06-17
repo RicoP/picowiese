@@ -142,7 +142,7 @@ end
 function apply_hero_jumping2() 
  if p.jumpvel >= 0 then return end
 
- print("junping")
+ print("jumping")
  
  p.y += p.jumpvel
  
