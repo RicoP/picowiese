@@ -92,6 +92,10 @@ function _update()
 end
 
 function _draw()
+ local camx=p.x - 48
+ if camx < 0 then camx=0 end
+ camera(camx, 0)
+
  map(0)
 
  hero_draw(4,9)
@@ -177,6 +181,8 @@ function apply_hero_movement()
  if p.state == p_state_stand then return end
  local x1 = p.x
  x1 += p.direction  
+
+ if x1 < 0 then return end
 
  local tl = mget(x1/8,p.y/8)
  if tl != 0 then return end
