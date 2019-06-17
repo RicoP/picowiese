@@ -98,6 +98,7 @@ function _draw()
  print(p.groundlevel)
  print(p.x .. " " .. p.y)
  print(p.y < p.groundlevel)
+ print(p.jumpvel)
  g_frame = g_frame + 1
 end
 
@@ -132,8 +133,8 @@ function apply_hero_falling()
 end
 
 function apply_hero_jumping2()
- if btnd(🅾️) and y == p.groundlevel then
-  jumpvel = p_jumpstrength
+ if btnd(🅾️) and p.y == p.groundlevel then
+  p.jumpvel = -p_jumpstrength
  end
 end
 
