@@ -61,6 +61,8 @@ function _init()
 end
 
 function _update()
+ if (g_frame % 4) != 0 then return end
+ 
  cls(1)
  btn_update()
  p.state = p_state_stand 
@@ -144,10 +146,13 @@ function apply_hero_jumping2()
 
  print("jumping")
  
- p.y += p.jumpvel
+ local y = p.y
  
- if p.y < p.groundlevel then
+ y += p.jumpvel
+ 
+ if y < p.groundlevel then
   p.jumpvel += 0.5
+  p.y = y
  else
   p.jumpvel = 0
   p.y = p.groundlevel
