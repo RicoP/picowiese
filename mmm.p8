@@ -145,10 +145,13 @@ function apply_hero_movement()
  if p.state == p_state_stand then return end
  local p1 = clone(p)
  p1.x += p.direction  
+
  local t1 = mget(p1.x/8,p1.y/8)
  if t1 != 0 then return end
+
  t1 = mget((p1.x+7)/8,p1.y/8)
  if t1 != 0 then return end
+
  p = p1
 end
 
@@ -168,7 +171,9 @@ function hero_movement()
 end
 
 function physics_update()
- p.groundlevel = calc_groundlevel(p.x,p.y)
+ local g1 = calc_groundlevel(p.x,p.y)
+ local g2 = calc_groundlevel(p.x+7,p.y)
+ p.groundlevel = min(g1,g2) 
 end
 -->8
 -- draw functions
