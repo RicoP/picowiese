@@ -167,8 +167,12 @@ function hero_movement()
   p.direction = 1
  end  
 
+ local oldx = p.x
  apply_hero_jumping() 
  apply_hero_movement()
+ if oldx == p.x then
+  p.state = p_state_stand
+ end
 end
 
 function physics_update()
