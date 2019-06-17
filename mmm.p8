@@ -121,20 +121,22 @@ end
 
 function apply_hero_jumping()
  --jumping
- local p1 = clone(p)
- if btnd(🅾️) and p1.y == p1.groundlevel then
-  p.jumpvel = p_jumpstrength
+ local y = p.y
+ local jumpvel = p.jumpvel
+ 
+ if btnd(🅾️) and y == p.groundlevel then
+  jumpvel = p_jumpstrength
  end
 
- p1.y -= p1.jumpvel
- p1.jumpvel -= 0.5
+ y -= jumpvel
+ jumpvel -= 0.5
 
- if p1.y >= p1.groundlevel then
-  p1.y = p1.groundlevel
-  p1.jumpvel = 0
+ if y >= p.groundlevel then
+  y = p.groundlevel
+  jumpvel = 0
  end
  
- if calc_groundlevel(p1.x,p1.y) != p.groundlevel then
+ if calc_groundlevel(p.x,y) != p.groundlevel then
   -- hitting the ceiling but 
   -- being off by just a little 
   -- bit. round player position
@@ -143,7 +145,8 @@ function apply_hero_jumping()
   return
  end
  
- p = p1
+ p.y = y
+ p.jumpvel = jumpvel
 end
 
 function apply_hero_movement()
