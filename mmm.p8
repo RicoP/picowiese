@@ -121,10 +121,19 @@ end
 -- movement functions
 
 function apply_hero_falling()
+ p.y += p.jumpvel
+ 
  if p.y < p.groundlevel then
-  p.y += p.jumpvel
+  p.jumpvel += 0.5
  else
+  p.jumpvel = 0
   p.y = p.groundlevel
+ end
+end
+
+function apply_hero_jumping2()
+ if btnd(🅾️) and y == p.groundlevel then
+  jumpvel = p_jumpstrength
  end
 end
 
@@ -184,8 +193,10 @@ function hero_movement()
  end  
 
  local oldx = p.x
- apply_hero_jumping() 
- apply_hero_movement()
+ apply_hero_falling()
+ apply_hero_jumping2()
+ --apply_hero_jumping() 
+ apply_hero_movement() 
  if oldx == p.x then
   p.state = p_state_stand
  end
