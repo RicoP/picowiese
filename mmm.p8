@@ -122,6 +122,8 @@ end
 -- movement functions
 
 function apply_hero_falling()
+ if p.jumpvel < 0 then return end
+
  p.y += p.jumpvel
  
  if p.y < p.groundlevel then
@@ -132,10 +134,18 @@ function apply_hero_falling()
  end
 end
 
-function apply_hero_jumping2()
- if btnd(🅾️) and p.y == p.groundlevel then
-  p.jumpvel = -p_jumpstrength
- end
+function apply_hero_jumping2() 
+ if p.jumpvel > 0 then return end
+ 
+ --local y = p.y
+ --y += p.jumpvel
+ 
+ if p.y < p.groundlevel then
+  p.jumpvel += 0.5
+ else
+  p.jumpvel = 0
+  p.y = p.groundlevel
+ end 
 end
 
 function apply_hero_jumping()
@@ -192,6 +202,10 @@ function hero_movement()
   p.state = p_state_run
   p.direction = 1
  end  
+
+ if btnd(🅾️) and p.y == p.groundlevel then
+  p.jumpvel = -p_jumpstrength
+ end 
 
  local oldx = p.x
  apply_hero_falling()
