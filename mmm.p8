@@ -61,7 +61,7 @@ function _init()
 end
 
 function _update()
- if (g_frame % 4) != 0 then return end
+ --if (g_frame % 4) != 0 then return end
  
  cls(1)
  btn_update()
@@ -152,11 +152,18 @@ function apply_hero_jumping2()
  
  if y < p.groundlevel then
   p.jumpvel += 0.5
-  p.y = y
  else
   p.jumpvel = 0
-  p.y = p.groundlevel
+  y = p.groundlevel
  end 
+
+ if calc_groundlevel(p.x,y) == p.groundlevel then
+  p.y = y
+ else
+  --bonged our head
+  --on the ceiling
+  p.y = flr(p.y/8)*8
+ end
 end
 
 function apply_hero_jumping()
