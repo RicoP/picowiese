@@ -135,6 +135,11 @@ function calc_groundlevel(x,y)
  return (ty-1)*8
 end
 
+function calc_char_groundlevel(x,y,w)
+ local g0 = calc_groundlevel(x,y)
+ local g1 = calc_groundlevel(x-1+w,y)
+ return min(g0,g1)
+end
 -->8
 -- movement functions
 
@@ -171,9 +176,7 @@ function apply_hero_jumping()
   y = p.groundlevel
  end 
 
- local g1 = calc_groundlevel(p.x,y)
- local g2 = calc_groundlevel(p.x+7,y)
- local g = min(g1,g2) 
+ local g = calc_char_groundlevel(p.x,y,8)
 
  if g == p.groundlevel then
   p.y = y
@@ -262,9 +265,7 @@ function hero_movement()
 end
 
 function physics_update()
- local g1 = calc_groundlevel(p.x,p.y)
- local g2 = calc_groundlevel(p.x+7,p.y)
- p.groundlevel = min(g1,g2) 
+ p.groundlevel = calc_char_groundlevel(p.x,p.y,8)
 end
 -->8
 -- draw functions
