@@ -113,8 +113,11 @@ function _update()
  end
  
  --melon logic
- for i,melon in pairs(melons) do
-  melon.x += melon.direction * melon_speed
+ for m in all(melons) do
+  m.x += m.direction * melon_speed
+  if abs(p.x - m.x) > 256 then
+   del(melons,m)
+  end
  end
  
  --item logic
@@ -133,7 +136,8 @@ function _update()
    hurt_hero(20)
   end
  end
- 
+
+ print(#melons) 
  print(p.groundlevel)
  print(p.x .. " " .. p.y)
  print(p.health)
