@@ -8,7 +8,8 @@ g_state_dead = 3
 
 --globals
 g_frame = 0
-g_state = g_state_spawn
+g_frame_ref = 0
+g_state = g_state_run
 
 --enemies
 enemy_skull = 64
@@ -114,12 +115,6 @@ function _update()
  cursor(11,5)
  btn_update()
 
- p.state = p_state_stand 
- 
- physics_update()
-
- hero_movement()
- 
  --melon logic
  for m in all(melons) do
   m.x += m.direction * melon_speed
@@ -149,6 +144,16 @@ function _update()
   entity_update(e)
  end
 
+ if g_state == g_state_run then
+	 p.state = p_state_stand 
+	 hero_movement()
+ end
+ if g_state == g_state_dead then
+  if frame() == 60 then
+   select_level(level)
+  end
+ end
+ 
  color(13)
  print(#melons) 
  print(p.groundlevel)
@@ -215,8 +220,16 @@ end
 function select_level(l)
  level = l
  p = cstr_player(levels[l].x,levels[l].y)
- g_state = g_state_spawn
+ g_state = g_state_run
  g_frame = 0
+end
+
+function timer_reset()
+ g_frame_ref = g_frame
+end
+
+function frame()
+ return g_frame - g_frame_ref
 end
 
 function calc_groundlevel(x,y)
@@ -253,6 +266,9 @@ function hurt_hero(damage)
 end
 
 function kill_hero()
+ g_state = g_state_dead
+ timer_reset()
+ 
  p.health = 0
  
  for i=1,6 do
@@ -362,6 +378,8 @@ function check_hero_touch(x,y)
 end
 
 function hero_movement()
+ p.groundlevel = calc_char_groundlevel(p.x,p.y,8)
+
  if p.health == 0 then return end
  --walking 
  if btn(⬅️) and p.stuned == 0 then 
@@ -420,10 +438,6 @@ function check_spikes()
   check_hero_touch(p.x,p.y)
   check_hero_touch(p.x+8,p.y)
  end 
-end
-
-function physics_update()
- p.groundlevel = calc_char_groundlevel(p.x,p.y,8)
 end
 
 function enemy_update(e)
