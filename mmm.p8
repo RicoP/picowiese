@@ -31,7 +31,6 @@ flag_instadeath=1
 flag_hurt=2
 
 --melons == bullets
-melons = {}
 melon_speed = 3
 tile_melon = 32
 
@@ -115,14 +114,6 @@ function _update()
  cursor(11,5)
  btn_update()
 
- --melon logic
- for m in all(melons) do
-  m.x += m.direction * melon_speed
-  if abs(p.x - m.x) > 128 then
-   del(melons,m)
-  end
- end
- 
  --item logic
  for i,item in pairs(items) do
   if item.tile == item_health1 then
@@ -148,6 +139,7 @@ function _update()
 	 p.state = p_state_stand 
 	 hero_movement()
  end
+ 
  if g_state == g_state_dead then
   if frame() == 60 then
    select_level(level)
@@ -155,7 +147,7 @@ function _update()
  end
  
  color(13)
- print(#melons) 
+ print(#entities)
  print(p.groundlevel)
  print(p.x .. " " .. p.y)
  print(p.health)
@@ -282,6 +274,7 @@ function kill_hero()
 		if i==6 then e.velx,e.vely=-2,-1 end
 
 		e.tile = entity_explosion1
+		e.lifetime = 60
 		add(entities,e)  
  end
 end
@@ -419,8 +412,12 @@ function hero_movement()
  if btnd(❎) then
   local melon = {x=p.x, y=p.y}
   melon.direction = p.direction
+  melon.velx = p.direction * melon_speed
+  melon.vely = 0
   melon.player = true
-  add(melons, melon)
+  melon.tile = tile_melon
+  melon.lifetime = 20
+  add(entities, melon)
   sfx(0)
  end
 end
@@ -453,11 +450,11 @@ function enemy_update(e)
   e.x += e.direction
   
   if e.iframes == 0 then
-	  for m in all(melons) do
-	   if abs(e.x-m.x) < 6 and abs(e.y-m.y) < 8 then
+	  for m in all(entities) do
+	   if m.tile == tile_melon and abs(e.x-m.x) < 6 and abs(e.y-m.y) < 8 then
 	    e.health -= 20
 	    e.iframes = 10
-	    del(melons,m)
+	    del(entities,m)
 	   end
 	  end
 	 else
@@ -474,6 +471,12 @@ function entity_update(e)
  if e.velx and e.vely then
   e.x += e.velx
   e.y += e.vely
+ end
+ if e.lifetime then
+  e.lifetime -= 1
+  if e.lifetime == 0 then
+   del(entities,e)
+  end
  end
 end
 
@@ -530,13 +533,15 @@ function enemy_draw(e)
 end
 
 function entity_draw(e)
- if e.tile == entity_explosion1 then
-  local tile = e.tile
+ if not e.tile then return end
+ local tile = e.tile
+ 
+ if tile == entity_explosion1 then
   local flipt = g_frame % 20 < 10
   if g_frame % 40 < 20 then tile+=1 end
-
-  spr(tile, e.x, e.y, 1, 1, flipt)  
  end
+ 
+ spr(tile, e.x, e.y, 1, 1, flipt)
 end
 -->8
 --constructors
