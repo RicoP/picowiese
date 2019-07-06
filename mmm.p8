@@ -163,15 +163,6 @@ function _draw()
 
  palt(0, false)
  palt(14, true)
- pal(4,p.color1)
- pal(9,p.color2) 
- hero_draw()
- pal(4,4)
- pal(9,9)
- 
- for m in all(melons) do
-  spr(tile_melon, m.x, m.y, 1, 1, m.direction == -1)
- end
 
  for i in all(items) do
   spr(i.tile, i.x, i.y)
@@ -184,6 +175,8 @@ function _draw()
  for e in all(entities) do
   entity_draw(e)
  end
+
+ hero_draw()
  
  palt(0, true)
  palt(14, false)
@@ -513,7 +506,11 @@ function hero_draw()
  end
 
  --draw player 
+ pal(4,p.color1)
+ pal(9,p.color2) 
  spr(p_frame, p.x, p.y, 1, 1, p.direction == -1) 
+ pal(4,4)
+ pal(9,9)
 end
 
 function draw_healthbar()
