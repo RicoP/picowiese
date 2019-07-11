@@ -628,8 +628,13 @@ function turret_draw(e)
  local hz = 20 
  local turret_cooldown = 50
  
+ if p.x-e.x < -10 then t=t end
+ if p.x-e.x > 10 then t=t+2 end
+ if abs(p.x-e.x) <= 10 then t=t+1 end
+ 
  if s == "searching" then  
   e.time = turret_cooldown
+  t = tile_turret
   t += (g_frame/hz) % 3
  end
  if s == "spotted" then  
