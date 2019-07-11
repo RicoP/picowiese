@@ -464,7 +464,12 @@ function enemy_update(e)
   if abs(e.x-p.x) <= 8 and abs(e.y-p.y) <= 8 then
    hurt_hero(9)
   end
-  
+
+	 if e.velx and e.vely then
+	  e.x += e.velx
+	  e.y += e.vely
+	 end
+
   if e.direction then
 	  if e.direction == -1 and calc_groundlevel(e.x-1,e.y) != e.groundlevel then
 	   e.direction = -e.direction
@@ -601,6 +606,20 @@ end
 --turret
 tile_turret = 13
 
+function turret_shoot(t)
+	local e = {}
+	e.x,e.y = t.x,t.y
+ e.velx = (p.x-t.x)/20
+ e.vely = (p.y-t.y)/20
+ e.iframes=0
+ e.health=100
+ 
+	e.tile = entity_explosion1
+	e.lifetime = 60
+	add(enemies,e)  
+
+end
+
 function turret_logic(e)
  local range = 45
  local s = e.state
@@ -616,6 +635,12 @@ function turret_logic(e)
   e.time -= 1
   if e.time == 0 then
    s = turret_time(s)
+  end
+ end
+
+ if s == "attacking" then  
+  if g_frame % 50 == 0 then
+   turret_shoot(e)
   end
  end
  
