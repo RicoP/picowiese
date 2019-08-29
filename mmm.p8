@@ -161,11 +161,11 @@ function _update()
  end
  
  color(13)
- print(#entities)
- print(p.groundlevel)
- print(p.x .. " " .. p.y)
- print(p.health)
- print(p.jumpvel)
+ --print(#entities)
+ --print(p.groundlevel)
+ --print(p.x .. " " .. p.y)
+ --print(p.health)
+ --print(p.jumpvel)
  
  for e in all(enemies) do
   if e.tile == tile_turret then
@@ -680,25 +680,27 @@ function turret_draw(e)
  spr(t, e.x, e.y)
 end
 -->8
---turret statemachine
+-- turret statemachine
+
+
+
 function turret_in(s)
- if s == "searching" then return "spotted" end
+ if s == "searching" then return "spotted" end 
+
  return s
 end
 
 function turret_out(s)
- if s == "spotted" then return "searching" end
- if s == "attacking" then return "waiting" end
+ if s == "spotted" then return "searching" end 
+
  return s
 end
 
 function turret_time(s)
- if s == "spotted" then return "attacking" end
- if s == "waiting" then return "searching" end 
- return s 
+ if s == "spotted" then return "attacking" end 
+
+ return s
 end
-
-
 __gfx__
 00000000e44444eee44444eee44444eee44444ee0bb00bb00bbb0bb00bb3bbb00bb00bb00bb00bb00bbb0bb00bbb3bb00bb00bb0333333333333333333333333
 00000000e47171ee4471714ee47171eee47171eeb333b333b355b333b5335553b355b333b333b333b355b333b5335553b355b333e333333ee333333ee333333e
