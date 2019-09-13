@@ -83,8 +83,8 @@ function _init()
 music(0)
 t=0
 cls()
-seed = rnd(9999);
 srand(1)
+seed = rnd(9999);
 
 camx = 0
 camy = 0
@@ -92,7 +92,7 @@ c1_x = 0
 c1_y = 0
 tile = 32
 zoom = 128
-biome = 16 --16 for sand, 0 for full range, 32 for icy tundra
+biome = 0 --16 for sand, 0 for full range, 32 for icy tundra
 
 --wind_
 wind_x = 1
@@ -113,29 +113,6 @@ for star=0,20 do
   s.py = s.y;
   s.col = s_col[flr(rnd(4))+1]
   add(stars,s)
-end
-
-function draw_stars()
-
-  wind_t+=0.2;
-
-  wind_x = cos(wind_t/100)
-  wind_y = sin(wind_t/100)
-
-  s.x -= s.col*wind_x;
-  s.y -= s.col*wind_y;
-
-  for s in all(stars) do
-    s.x -= s.col*wind_x;
-    s.y -= s.col*wind_y;
-    if(s.x<0) then s.x = 128; s.px = s.x; end
-    if(s.y<0) then s.y = 128; s.py = s.y; end
-    if(s.x>128) then s.x = 0; s.px = s.x; end
-    if(s.y>128) then s.y = 0; s.py = s.y; end
-    spr(s.spr,camx+s.px,camy+s.py)
-    --line(camx+s.x,camy+s.y,camx+s.px,camy+s.py,s.col)
-   s.px = s.x; s.py = s.y;
-  end
 end
 
 function get_spr(c,set)
@@ -222,6 +199,7 @@ end
 function _update()
   
  foreach(zones,update_zone)
+ 
  for i=0,4 do
    for j=0,4 do
      block_x1 = (i+flr(c1_x/tile))*tile
@@ -233,13 +211,16 @@ function _update()
      if(zone_exist==false) then mk_zone(block_x1,block_y1) end
    end
  end
-
+ 
  spd=3;
  if(btn(0)) camx -=spd
  if(btn(1)) camx +=spd
  if(btn(2)) camy -=spd
  if(btn(3)) camy +=spd
 
+ if(btnp(❎)) zoom *=2
+ if(btnp(🅾️)) zoom /=2
+ 
  --camy +=spd*2
  c1_x += ((camx)-c1_x) * 0.1
  c1_y += ((camy)-c1_y) * 0.1
@@ -252,9 +233,9 @@ end
 function _draw()
 cls();
 foreach(zones,draw_zone)
-draw_stars()
-print('mem:'..stat(0), c1_x, c1_y, 7)
-print('cpu:'..stat(1), c1_x, c1_y+8, 7)
+--draw_stars()
+--print('mem:'..stat(0), c1_x, c1_y, 7)
+--print('cpu:'..stat(1), c1_x, c1_y+8, 7)
 
 end
 
