@@ -19,6 +19,47 @@ function vec3_copy(res, v)
  return res
 end
 
+function vec3_cross(res, a, b)
+ res.x = a.y*b.z -a.z*b.y
+ res.y = a.z*b.x -a.x*b.z
+ res.z = a.x*b.y -a.y*b.x
+ return res
+end
+
+function vec3_add(res, a, b)
+ res.x=a.x+b.x
+ res.y=a.y+b.y
+ res.z=a.z+b.z
+ return res
+end
+
+function vec3_sub(res, a, b)
+ res.x=a.x-b.x
+ res.y=a.y-b.y
+ res.z=a.z-b.z
+ return res
+end
+
+function vec3_len_sqr(v)
+ return v.x*v.x+v.y*v.y+v.z*v.z
+end
+
+function vec3_dot(a,b)
+ return a.x*b.x+a.y*b.y+a.z*b.z
+end
+
+function vec3_len(v)
+ return sqrt(vec3_len_sqr(v))
+end
+
+function vec3_normalize(n)
+ local il=1/vec3_len(n)
+ n.x *= il
+ n.y *= il
+ n.z *= il
+ return n
+end
+
 function vec3_mul(res, v, m)
  vec3_copy(res, v)
  res.x = 0
@@ -137,7 +178,7 @@ function draw_tri(tri, c)
 end
 
 --http://www.sunshine2k.de/coding/java/trianglerasterization/trianglerasterization.html?source=post_page-----7acf535cd125----------------------
-function fill_tri_bott(v1x,v1y,v2x,v2y,v3x)
+function fill_tri_bot(v1x,v1y,v2x,v2y,v3x)
  local invslope1 = (v2x-v1x) / (v2y-v1y)
  local invslope2 = (v3x-v1x) / (v2y-v1y)
 
@@ -171,12 +212,13 @@ end
 
 function fill_tri(v1,v2,v3, c)
  color(c)
+ --sort tris top to bottom
  if v1.y>v2.y then v1,v2=v2,v1 end
  if v2.y>v3.y then v2,v3=v3,v2 end
  if v1.y>v2.y then v1,v2=v2,v1 end
 
  local v4x=(v1.x+((v2.y-v1.y)/(v3.y-v1.y)) * (v3.x-v1.x))
- fill_tri_bott(v1.x,v1.y,v2.x,v2.y,v4x)
+ fill_tri_bot(v1.x,v1.y,v2.x,v2.y,v4x)
  fill_tri_top(v3.x,v3.y,v2.x,v2.y,v4x)
 end
 -->8
@@ -196,7 +238,7 @@ function _init()
    triangle({vec3d(1,0,1), vec3d(0,1,1), vec3d(0,0,1)}),
    --west
    triangle({vec3d(0,0,1), vec3d(0,1,1), vec3d(0,1,0)}),
-   triangle({vec3d(0,0,1), vec3d(0,1,0), vec3d(0,0,1)}),
+   triangle({vec3d(0,0,1), vec3d(0,1,0), vec3d(0,0,0)}),
    --top
    triangle({vec3d(0,1,0), vec3d(0,1,1), vec3d(1,1,1)}),
    triangle({vec3d(0,1,0), vec3d(1,1,1), vec3d(1,1,0)}),
@@ -214,6 +256,8 @@ function _draw()
  cls(0)
  --draw triangles 
  --aspect is 128:128 == 1
+ 
+ local eye=vec3d(0,0,0)
  
  --projection matrix
  local fovrad = 1/tan(cfov/90)
@@ -259,6 +303,19 @@ function _draw()
   tri_trans.p[1].z += 2
   tri_trans.p[2].z += 2
   tri_trans.p[3].z += 2
+
+  local l1 = {x=0,y=0,z=0}
+  vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
+  local l2 = {x=0,y=0,z=0}
+  vec3_sub(l2, tri_trans.p[3],tri_trans.p[2])
+
+  local n = {x=0,y=0,z=0}
+  vec3_cross(n,l1,l2)
+  vec3_normalize(n)
+  
+  local pn = vec3_sub({},tri_trans.p[1], eye)
+  
+  if vec3_dot(n,pn) > 0 then goto draw_tri_end end
   
   local tri_proj = triangle()
   vec3_mul(tri_proj.p[1],tri_trans.p[1],pmat)
@@ -282,6 +339,8 @@ function _draw()
   
   
   draw_tri(tri_proj, i)
+  
+  ::draw_tri_end::
  end  
  
  --fill_tri_bott(35,10,10,20,20)
