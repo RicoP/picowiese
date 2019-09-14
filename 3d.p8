@@ -146,6 +146,10 @@ function draw_tri(tri, c)
  end
 end
 
+function draw_scanline(x,y,x2)
+ rectfill(x,y,x2,y)
+end
+
 --http://www.sunshine2k.de/coding/java/trianglerasterization/trianglerasterization.html?source=post_page-----7acf535cd125----------------------
 function fill_tri_bot(v1x,v1y,v2x,v2y,v3x)
  local invslope1 = (v2x-v1x) / (v2y-v1y)
@@ -156,7 +160,7 @@ function fill_tri_bot(v1x,v1y,v2x,v2y,v3x)
 
  local scanliney=v1y
  while scanliney <= v2y do
-  line(curx1, scanliney, curx2, scanliney)
+  draw_scanline(curx1, scanliney, curx2)
   curx1 += invslope1
   curx2 += invslope2
   scanliney+=1
@@ -172,7 +176,7 @@ function fill_tri_top(v3x,v3y,v1x,v1y,v2x)
 
  local scanliney = v3y
  while scanliney > v1y do
-  line(curx1, scanliney, curx2, scanliney);
+  draw_scanline(curx1, scanliney, curx2)
   curx1 -= invslope1
   curx2 -= invslope2
   scanliney-=1
@@ -186,6 +190,7 @@ function fill_tri(v1,v2,v3)
  if v1.y>v2.y then v1,v2=v2,v1 end
 
  local v4x=(v1.x+((v2.y-v1.y)/(v3.y-v1.y)) * (v3.x-v1.x))
+
  fill_tri_bot(v1.x,v1.y,v2.x,ceil(v2.y),v4x)
  fill_tri_top(v3.x,v3.y,v2.x,flr(v2.y),v4x)
 end
@@ -205,9 +210,6 @@ function print_stat()
 end
 
 function _init()
-end
-
-function _update()
 end
 
 function _draw()
@@ -247,7 +249,22 @@ function _draw()
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
 
- for i,t in pairs(bunny_mesh.tris) do
+ local m = bunny_mesh
+ local t = triangle()
+
+ local num_tris = #m.faces / 3
+ for f = 0,num_tris-1 do
+  local foff=f*3
+  
+  for i=1,3 do
+   local face = m.faces[foff+i]-1
+   local p = t.p[i]
+   local vidx = 1+3*face
+	  p.x=m.vert[vidx]
+	  p.y=m.vert[vidx+1]
+	  p.z=m.vert[vidx+2]
+  end
+  
   local trirotz=triangle()
   vec3_mul(trirotz.p[1],t.p[1],matrotz)
   vec3_mul(trirotz.p[2],t.p[2],matrotz)
@@ -259,9 +276,9 @@ function _draw()
   vec3_mul(trirotzx.p[3],trirotz.p[3],matrotx)
 
   local tri_trans=triangle(trirotzx.p)
-  tri_trans.p[1].z += 8
-  tri_trans.p[2].z += 8
-  tri_trans.p[3].z += 8
+  tri_trans.p[1].z += 5
+  tri_trans.p[2].z += 5
+  tri_trans.p[3].z += 5
 
   local l1 = {x=0,y=0,z=0}
   vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
@@ -297,7 +314,7 @@ function _draw()
   tri_proj.p[3].x *=64
   tri_proj.p[3].y *=64
 
-  local col = 1 + i%15
+  local col = 1 + f%15
 		gcx.fill = true
   draw_tri(tri_proj, col)
 		
@@ -321,10 +338,10 @@ end
 
 -->8
 ---------------------
---#include cube.lua
+#include cube.lua
 #include ball.lua
---#include ship.lua
---#include arwing.lua
+#include ship.lua
+#include arwing.lua
 #include bunny.lua
 ---------------------
 __gfx__

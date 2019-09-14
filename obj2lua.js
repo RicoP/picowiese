@@ -43,8 +43,23 @@ printLine(filename);
 
 print(filename);
 printLine("_mesh = {")
-printLine(" tris = {")
-for(let i = 0; i != faces.length; ++i) {
+printLine(" vert = {")
+for(let v = 0; v != tris.length; ++v) {
+	print( tris[v].join(",") )
+	if(v != tris.length -1) print(",");
+	printLine("");
+}
+printLine(" },")
+
+printLine(" faces = {")
+for(let f = 0; f != faces.length; ++f) {
+	print( faces[f].join(",") )
+	if(f != faces.length -1) print(",");
+	printLine("");
+}
+printLine(" }")
+
+/*for(let i = 0; i != faces.length; ++i) {
 	let face = faces[i];
 	print("  triangle({")
 	for(let f = 0; f != face.length; ++f) {
@@ -59,8 +74,7 @@ for(let i = 0; i != faces.length; ++i) {
 		print(",");
 	}
 	printLine("");
-}
-printLine(" }")
+}*/
 printLine("}")
 
 
