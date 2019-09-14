@@ -3,13 +3,18 @@ version 18
 __lua__
 --globals
 local cnear = .1
-local cfar  = 1000
+local cfar  = 100
 local cfov  = 60
 local frame = 0
 
+--graphics context
+local gcx = {
+ fill = true
+}
+
 --math
-function tan(a) return 
- sin(a)/cos(a) 
+function tan(a) return
+ sin(a)/cos(a)
 end
 
 function vec3_copy(res, v)
@@ -66,36 +71,36 @@ function vec3_mul(res, v, m)
  res.x += m[1][1] * v.x
  res.x += m[2][1] * v.y
  res.x += m[3][1] * v.z
- res.x += m[4][1] 
- 
+ res.x += m[4][1]
+
  res.y = 0
  res.y += m[1][2] * v.x
  res.y += m[2][2] * v.y
  res.y += m[3][2] * v.z
- res.y += m[4][2] 
- 
+ res.y += m[4][2]
+
  res.z = 0
  res.z += m[1][3] * v.x
  res.z += m[2][3] * v.y
  res.z += m[3][3] * v.z
- res.z += m[4][3] 
- 
+ res.z += m[4][3]
+
  local w = 0
  w += m[1][4] * v.x
  w += m[2][4] * v.y
  w += m[3][4] * v.z
- w += m[4][4] 
- 
+ w += m[4][4]
+
  if w != 0 then
   res.x /= w
   res.y /= w
   res.z /= w
  end
- 
+
  return res
 end
 -->8
--- 3d rasterizer 
+-- 3d rasterizer
 
 function vec3d(x, y, z)
  local this = {}
@@ -119,7 +124,7 @@ function mesh()
  local this = {}
  this.tris = {}
  return this
-end 
+end
 
 function matrix()
  return {{0,0,0,0},
@@ -128,7 +133,7 @@ function matrix()
          {0,0,0,0}}
 end
 -->8
---draw functions 
+--draw functions
 
 --https://www.lexaloffle.com/bbs/?tid=2171
 fill_triz = function(a,b,c,col)
@@ -170,11 +175,14 @@ fill_triz = function(a,b,c,col)
 end
 
 function draw_tri(tri, c)
- --fill_tri(tri.p[3],tri.p[2],tri.p[1],c)
  color(c)
- line(tri.p[1].x,tri.p[1].y,tri.p[2].x,tri.p[2].y) 
- line(tri.p[2].x,tri.p[2].y,tri.p[3].x,tri.p[3].y) 
- line(tri.p[3].x,tri.p[3].y,tri.p[1].x,tri.p[1].y) 
+ if gcx.fill then
+  fill_tri(tri.p[1],tri.p[2],tri.p[3])
+ else
+  line(tri.p[1].x,tri.p[1].y,tri.p[2].x,tri.p[2].y)
+  line(tri.p[2].x,tri.p[2].y,tri.p[3].x,tri.p[3].y)
+  line(tri.p[3].x,tri.p[3].y,tri.p[1].x,tri.p[1].y)
+ end
 end
 
 --http://www.sunshine2k.de/coding/java/trianglerasterization/trianglerasterization.html?source=post_page-----7acf535cd125----------------------
@@ -186,7 +194,7 @@ function fill_tri_bot(v1x,v1y,v2x,v2y,v3x)
  local curx2 = v1x
 
  local scanliney=v1y
- while scanliney <= v2y do 
+ while scanliney <= v2y do
   line(curx1, scanliney, curx2, scanliney)
   curx1 += invslope1
   curx2 += invslope2
@@ -201,7 +209,7 @@ function fill_tri_top(v3x,v3y,v1x,v1y,v2x)
  local curx1 = v3x
  local curx2 = v3x
 
- local int scanliney = v3y
+ local scanliney = v3y
  while scanliney > v1y do
   line(curx1, scanliney, curx2, scanliney);
   curx1 -= invslope1
@@ -210,21 +218,25 @@ function fill_tri_top(v3x,v3y,v1x,v1y,v2x)
  end
 end
 
-function fill_tri(v1,v2,v3, c)
- color(c)
+function fill_tri(v1,v2,v3)
  --sort tris top to bottom
  if v1.y>v2.y then v1,v2=v2,v1 end
  if v2.y>v3.y then v2,v3=v3,v2 end
  if v1.y>v2.y then v1,v2=v2,v1 end
 
  local v4x=(v1.x+((v2.y-v1.y)/(v3.y-v1.y)) * (v3.x-v1.x))
- fill_tri_bot(v1.x,v1.y,v2.x,v2.y,v4x)
- fill_tri_top(v3.x,v3.y,v2.x,v2.y,v4x)
+ fill_tri_bot(v1.x,v1.y,v2.x,ceil(v2.y),v4x)
+ fill_tri_top(v3.x,v3.y,v2.x,flr(v2.y),v4x)
 end
 -->8
 local m = mesh()
 
+local shades = {0,1,2,3,13,4,11,7}
+
 function _init()
+ --print(peek(8/2 + 1))
+ --stop()
+
  m.tris = {
    --cube with clockwise ordered tris
    --south
@@ -254,11 +266,11 @@ end
 
 function _draw()
  cls(0)
- --draw triangles 
+ --draw triangles
  --aspect is 128:128 == 1
- 
+
  local eye=vec3d(0,0,0)
- 
+
  --projection matrix
  local fovrad = 1/tan(cfov/90)
  --test
@@ -270,7 +282,7 @@ function _draw()
  pmat[4][3]=(-cfar*cnear)/(cfar-cnear)
  pmat[3][4]=1
  pmat[4][4]=0
- 
+
  local theta=frame/60.0
  local matrotz=matrix()
  matrotz[1][1]=cos(theta)
@@ -279,7 +291,7 @@ function _draw()
  matrotz[2][2]=cos(theta)
  matrotz[3][3]=1
  matrotz[4][4]=1
- 
+
  local matrotx=matrix()
  matrotx[1][1]=1
  matrotx[2][2]=cos(theta*.5)
@@ -287,7 +299,7 @@ function _draw()
  matrotx[3][2]=-sin(theta*.5)
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
- 
+
  for i,t in pairs(m.tris) do
   local trirotz=triangle()
   vec3_mul(trirotz.p[1],t.p[1],matrotz)
@@ -298,7 +310,7 @@ function _draw()
   vec3_mul(trirotzx.p[1],trirotz.p[1],matrotx)
   vec3_mul(trirotzx.p[2],trirotz.p[2],matrotx)
   vec3_mul(trirotzx.p[3],trirotz.p[3],matrotx)
- 
+
   local tri_trans=triangle(trirotzx.p)
   tri_trans.p[1].z += 2
   tri_trans.p[2].z += 2
@@ -312,16 +324,17 @@ function _draw()
   local n = {x=0,y=0,z=0}
   vec3_cross(n,l1,l2)
   vec3_normalize(n)
-  
+
   local pn = vec3_sub({},tri_trans.p[1], eye)
-  
-  if vec3_dot(n,pn) > 0 then goto draw_tri_end end
-  
+  local d = vec3_dot(n,pn)
+
+  if d > 0 then goto draw_tri_end end
+
   local tri_proj = triangle()
   vec3_mul(tri_proj.p[1],tri_trans.p[1],pmat)
   vec3_mul(tri_proj.p[2],tri_trans.p[2],pmat)
   vec3_mul(tri_proj.p[3],tri_trans.p[3],pmat)
-  
+
   --move into screenspace
   tri_proj.p[1].x+=1
   tri_proj.p[1].y+=1
@@ -329,30 +342,29 @@ function _draw()
   tri_proj.p[2].y+=1
   tri_proj.p[3].x+=1
   tri_proj.p[3].y+=1
-  
+
   tri_proj.p[1].x *=64
   tri_proj.p[1].y *=64
   tri_proj.p[2].x *=64
   tri_proj.p[2].y *=64
   tri_proj.p[3].x *=64
   tri_proj.p[3].y *=64
-  
-  
+
   draw_tri(tri_proj, i)
-  
+
   ::draw_tri_end::
- end  
- 
+ end
+
  --fill_tri_bott(35,10,10,20,20)
  --color(14)
  --fill_tri_top(15,30,10,20,20)
- --fill_tri({x=5,y=0},{x=0,y=30},{x=20,y=20},7) 
+ --fill_tri({x=5,y=0},{x=0,y=30},{x=20,y=20},7)
  frame += 1
 end
 
 
 __gfx__
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000000000123d4b70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00700700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00077000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
