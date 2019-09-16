@@ -249,18 +249,16 @@ function _draw()
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
 
- local m = arwing_mesh
+ local m = cube_mesh
  local t = triangle()
 
  local num_tris = #m.faces
- for f = 1,num_tris do
-  --local foff=f*3
-  
+ for f = 1,num_tris do  
   local face = m.faces[f]
   for i=1,3 do
    local p = t.p[i]
-   local vidx = face[i]
-   local vert = m.vert[vidx]
+   local verti = face[i]
+   local vert = m.vert[verti]
 	  p.x=vert[1]
 	  p.y=vert[2]
 	  p.z=vert[3]
@@ -315,7 +313,8 @@ function _draw()
   tri_proj.p[3].x *=64
   tri_proj.p[3].y *=64
 
-  local col = 1 + f%15
+  local col = 1+f%15
+		
 		gcx.fill = true
   draw_tri(tri_proj, col)
 		
@@ -341,7 +340,7 @@ end
 ---------------------
 #include cube.lua
 #include ball.lua
-#include ship.lua
+--#include ship.lua
 #include arwing.lua
 #include bunny.lua
 --#include monkey.lua
