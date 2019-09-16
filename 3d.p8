@@ -201,7 +201,7 @@ function print_stat()
  color(1)
  cursor(2,2)
  local memp = 100*(stat(0)/2048)
- print("kib:  " .. ceil(memp) .. "%")
+ print("memo: " .. ceil(memp) .. "%")
  print("cpu1: " .. ceil(100*stat(1)) .. "%")
  print("cpu2: " .. ceil(100*stat(2)) .. "%")
  print("fps1: " .. stat(7))
@@ -249,20 +249,21 @@ function _draw()
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
 
- local m = bunny_mesh
+ local m = arwing_mesh
  local t = triangle()
 
- local num_tris = #m.faces / 3
- for f = 0,num_tris-1 do
-  local foff=f*3
+ local num_tris = #m.faces
+ for f = 1,num_tris do
+  --local foff=f*3
   
+  local face = m.faces[f]
   for i=1,3 do
-   local face = m.faces[foff+i]-1
    local p = t.p[i]
-   local vidx = 1+3*face
-	  p.x=m.vert[vidx]
-	  p.y=m.vert[vidx+1]
-	  p.z=m.vert[vidx+2]
+   local vidx = face[i]
+   local vert = m.vert[vidx]
+	  p.x=vert[1]
+	  p.y=vert[2]
+	  p.z=vert[3]
   end
   
   local trirotz=triangle()
@@ -276,9 +277,9 @@ function _draw()
   vec3_mul(trirotzx.p[3],trirotz.p[3],matrotx)
 
   local tri_trans=triangle(trirotzx.p)
-  tri_trans.p[1].z += 5
-  tri_trans.p[2].z += 5
-  tri_trans.p[3].z += 5
+  tri_trans.p[1].z += 8
+  tri_trans.p[2].z += 8
+  tri_trans.p[3].z += 8
 
   local l1 = {x=0,y=0,z=0}
   vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
@@ -343,6 +344,7 @@ end
 #include ship.lua
 #include arwing.lua
 #include bunny.lua
+--#include monkey.lua
 ---------------------
 __gfx__
 000000000123d4b7cccccccccccccccc000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

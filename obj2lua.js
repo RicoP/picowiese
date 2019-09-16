@@ -45,7 +45,9 @@ print(filename);
 printLine("_mesh = {")
 printLine(" vert = {")
 for(let v = 0; v != tris.length; ++v) {
+	print("{");
 	print( tris[v].join(",") )
+	print("}");
 	if(v != tris.length -1) print(",");
 	printLine("");
 }
@@ -53,7 +55,9 @@ printLine(" },")
 
 printLine(" faces = {")
 for(let f = 0; f != faces.length; ++f) {
+	print("{")
 	print( faces[f].join(",") )
+	print("}")
 	if(f != faces.length -1) print(",");
 	printLine("");
 }
