@@ -320,16 +320,6 @@ function _draw()
 
   if d > 0 then goto draw_tri_end end
 
-		local midp = vec3d()
-		vec3_add(midp,midp,tri_trans.p[1])
-		vec3_add(midp,midp,tri_trans.p[2])
-		vec3_add(midp,midp,tri_trans.p[3])
-  vec3_scale(midp,midp,0.333333)
-		vec3_sub(midp,midp,eye)
-		local dist = vec3_len_sqr(midp)  
-  face[4] = dist
-
-
   local tri_proj = triangle()
   vec3_mul(tri_proj.p[1],tri_trans.p[1],pmat)
   vec3_mul(tri_proj.p[2],tri_trans.p[2],pmat)
@@ -350,10 +340,15 @@ function _draw()
   tri_proj.p[3].x *=64
   tri_proj.p[3].y *=64
 
+		face[4] = tri_proj.p[1].z
+		face[4] += tri_proj.p[2].z
+		face[4] += tri_proj.p[3].z
+		face[4] *= 0.333333333
+
   local col = f%16
 		
 		gcx.fill = true
-  draw_tri(tri_proj, face[4])
+  draw_tri(tri_proj, col)
 		
 		gcx.fill = false
   draw_tri(tri_proj, 0)
