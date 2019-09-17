@@ -123,10 +123,11 @@ for(let v = 0; v != vecs.length; ++v) {
 printLine(" },")
 
 printLine(" faces = {")
+printLine(" -- v1, v2, v3, distance")
 for(let f = 0; f != faces.length; ++f) {
 	print("{")
 	print( faces[f].join(",") )
-	print("}")
+	print(",0}")
 	if(f != faces.length -1) print(",");
 	printLine("");
 }

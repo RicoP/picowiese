@@ -45,6 +45,13 @@ function vec3_sub(res, a, b)
  return res
 end
 
+function vec3_scale(res, a, s)
+ res.x=a.x*s
+ res.y=a.y*s
+ res.z=a.z*s
+ return res
+end
+
 function vec3_len_sqr(v)
  return v.x*v.x+v.y*v.y+v.z*v.z
 end
@@ -99,6 +106,26 @@ function vec3_mul(res, v, m)
 
  return res
 end
+
+--utils
+--https://www.lexaloffle.com/bbs/?pid=18374#p18374
+qsort=function (t, cmp, i, j)
+ i = i or 1
+ j = j or #t
+ if i < j then
+  local p = i
+  for k = i, j - 1 do
+   if cmp(t[k], t[j]) <= 0 then
+    t[p], t[k] = t[k], t[p]
+    p = p + 1
+   end
+  end
+  t[p], t[j] = t[j], t[p]
+  qsort(t, cmp, i, p - 1)
+  qsort(t, cmp, p + 1, j)  
+ end
+end
+
 -->8
 -- 3d rasterizer
 
@@ -232,7 +259,7 @@ function _draw()
  pmat[3][4]=1
  pmat[4][4]=0
 
- local theta=frame/60.0
+ local theta=frame/360.0
  local matrotz=matrix()
  matrotz[1][1]=cos(theta)
  matrotz[1][2]=sin(theta)
@@ -249,7 +276,7 @@ function _draw()
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
 
- local m = cube_mesh
+ local m = arwing_mesh
  local t = triangle()
 
  local num_tris = #m.faces
@@ -275,9 +302,9 @@ function _draw()
   vec3_mul(trirotzx.p[3],trirotz.p[3],matrotx)
 
   local tri_trans=triangle(trirotzx.p)
-  tri_trans.p[1].z += 8
-  tri_trans.p[2].z += 8
-  tri_trans.p[3].z += 8
+  tri_trans.p[1].z += 7
+  tri_trans.p[2].z += 7
+  tri_trans.p[3].z += 7
 
   local l1 = {x=0,y=0,z=0}
   vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
@@ -293,11 +320,21 @@ function _draw()
 
   if d > 0 then goto draw_tri_end end
 
+		local midp = vec3d()
+		vec3_add(midp,midp,tri_trans.p[1])
+		vec3_add(midp,midp,tri_trans.p[2])
+		vec3_add(midp,midp,tri_trans.p[3])
+  vec3_scale(midp,midp,0.333333)
+		vec3_sub(midp,midp,eye)
+		local dist = vec3_len_sqr(midp)  
+  face[4] = dist
+
+
   local tri_proj = triangle()
   vec3_mul(tri_proj.p[1],tri_trans.p[1],pmat)
   vec3_mul(tri_proj.p[2],tri_trans.p[2],pmat)
   vec3_mul(tri_proj.p[3],tri_trans.p[3],pmat)
-
+  
   --move into screenspace
   tri_proj.p[1].x+=1
   tri_proj.p[1].y+=1
@@ -313,10 +350,10 @@ function _draw()
   tri_proj.p[3].x *=64
   tri_proj.p[3].y *=64
 
-  local col = 1+f%15
+  local col = f%16
 		
 		gcx.fill = true
-  draw_tri(tri_proj, col)
+  draw_tri(tri_proj, face[4])
 		
 		gcx.fill = false
   draw_tri(tri_proj, 0)
@@ -324,6 +361,13 @@ function _draw()
 		tris_drawn += 1
   ::draw_tri_end::
  end
+
+ --sort triangles by 
+ --distance in last frame
+ qsort(m.faces, function(l,r)
+  return r[4]-l[4]
+ end)
+
 
  --fill_tri_bott(35,10,10,20,20)
  --color(14)
