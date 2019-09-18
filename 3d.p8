@@ -18,46 +18,46 @@ function tan(a) return
 end
 
 function vec3_copy(res, v)
- res.x=v.x
- res.y=v.y
- res.z=v.z
+ res[1]=v[1]
+ res[2]=v[2]
+ res[3]=v[3]
  return res
 end
 
 function vec3_cross(res, a, b)
- res.x = a.y*b.z -a.z*b.y
- res.y = a.z*b.x -a.x*b.z
- res.z = a.x*b.y -a.y*b.x
+ res[1] = a[2]*b[3] -a[3]*b[2]
+ res[2] = a[3]*b[1] -a[1]*b[3]
+ res[3] = a[1]*b[2] -a[2]*b[1]
  return res
 end
 
 function vec3_add(res, a, b)
- res.x=a.x+b.x
- res.y=a.y+b.y
- res.z=a.z+b.z
+ res[1]=a[1]+b[1]
+ res[2]=a[2]+b[2]
+ res[3]=a[3]+b[3]
  return res
 end
 
 function vec3_sub(res, a, b)
- res.x=a.x-b.x
- res.y=a.y-b.y
- res.z=a.z-b.z
+ res[1]=a[1]-b[1]
+ res[2]=a[2]-b[2]
+ res[3]=a[3]-b[3]
  return res
 end
 
 function vec3_scale(res, a, s)
- res.x=a.x*s
- res.y=a.y*s
- res.z=a.z*s
+ res[1]=a[1]*s
+ res[2]=a[2]*s
+ res[3]=a[3]*s
  return res
 end
 
 function vec3_len_sqr(v)
- return v.x*v.x+v.y*v.y+v.z*v.z
+ return v[1]*v[1]+v[2]*v[2]+v[3]*v[3]
 end
 
 function vec3_dot(a,b)
- return a.x*b.x+a.y*b.y+a.z*b.z
+ return a[1]*b[1]+a[2]*b[2]+a[3]*b[3]
 end
 
 function vec3_len(v)
@@ -66,42 +66,42 @@ end
 
 function vec3_normalize(n)
  local il=1/vec3_len(n)
- n.x *= il
- n.y *= il
- n.z *= il
+ n[1] *= il
+ n[2] *= il
+ n[3] *= il
  return n
 end
 
 function vec3_mul(res, v, m)
  vec3_copy(res, v)
- res.x = 0
- res.x += m[1][1] * v.x
- res.x += m[2][1] * v.y
- res.x += m[3][1] * v.z
- res.x += m[4][1]
+ res[1] = 0
+ res[1] += m[1][1] * v[1]
+ res[1] += m[2][1] * v[2]
+ res[1] += m[3][1] * v[3]
+ res[1] += m[4][1]
 
- res.y = 0
- res.y += m[1][2] * v.x
- res.y += m[2][2] * v.y
- res.y += m[3][2] * v.z
- res.y += m[4][2]
+ res[2] = 0
+ res[2] += m[1][2] * v[1]
+ res[2] += m[2][2] * v[2]
+ res[2] += m[3][2] * v[3]
+ res[2] += m[4][2]
 
- res.z = 0
- res.z += m[1][3] * v.x
- res.z += m[2][3] * v.y
- res.z += m[3][3] * v.z
- res.z += m[4][3]
+ res[3] = 0
+ res[3] += m[1][3] * v[1]
+ res[3] += m[2][3] * v[2]
+ res[3] += m[3][3] * v[3]
+ res[3] += m[4][3]
 
  local w = 0
- w += m[1][4] * v.x
- w += m[2][4] * v.y
- w += m[3][4] * v.z
+ w += m[1][4] * v[1]
+ w += m[2][4] * v[2]
+ w += m[3][4] * v[3]
  w += m[4][4]
 
  if w != 0 then
-  res.x /= w
-  res.y /= w
-  res.z /= w
+  res[1] /= w
+  res[2] /= w
+  res[3] /= w
  end
 
  return res
@@ -122,7 +122,7 @@ qsort=function (t, cmp, i, j)
   end
   t[p], t[j] = t[j], t[p]
   qsort(t, cmp, i, p - 1)
-  qsort(t, cmp, p + 1, j)  
+  qsort(t, cmp, p + 1, j)
  end
 end
 
@@ -130,11 +130,7 @@ end
 -- 3d rasterizer
 
 function vec3d(x, y, z)
- local this = {}
- this.x=x or 0
- this.y=y or 0
- this.z=z or 0
- return this
+ return {x,y,z}
 end
 
 function triangle(p)
@@ -142,7 +138,7 @@ function triangle(p)
  if p then
   this.p = {vec3_copy({},p[1]), vec3_copy({},p[2]), vec3_copy({},p[3])}
  else
-  this.p = {vec3d(), vec3d(), vec3d()}
+  this.p = {vec3d({0,0,0}), vec3d({0,0,0}), vec3d({0,0,0})}
  end
  return this
 end
@@ -167,9 +163,9 @@ function draw_tri(tri, c)
  if gcx.fill then
   fill_tri(tri.p[1],tri.p[2],tri.p[3])
  else
-  line(tri.p[1].x,tri.p[1].y,tri.p[2].x,tri.p[2].y)
-  line(tri.p[2].x,tri.p[2].y,tri.p[3].x,tri.p[3].y)
-  line(tri.p[3].x,tri.p[3].y,tri.p[1].x,tri.p[1].y)
+  line(tri.p[1][1],tri.p[1][2],tri.p[2][1],tri.p[2][2])
+  line(tri.p[2][1],tri.p[2][2],tri.p[3][1],tri.p[3][2])
+  line(tri.p[3][1],tri.p[3][2],tri.p[1][1],tri.p[1][2])
  end
 end
 
@@ -212,14 +208,14 @@ end
 
 function fill_tri(v1,v2,v3)
  --sort tris top to bottom
- if v1.y>v2.y then v1,v2=v2,v1 end
- if v2.y>v3.y then v2,v3=v3,v2 end
- if v1.y>v2.y then v1,v2=v2,v1 end
+ if v1[2]>v2[2] then v1,v2=v2,v1 end
+ if v2[2]>v3[2] then v2,v3=v3,v2 end
+ if v1[2]>v2[2] then v1,v2=v2,v1 end
 
- local v4x=(v1.x+((v2.y-v1.y)/(v3.y-v1.y)) * (v3.x-v1.x))
+ local v4x=(v1[1]+((v2[2]-v1[2])/(v3[2]-v1[2])) * (v3[1]-v1[1]))
 
- fill_tri_bot(v1.x,v1.y,v2.x,ceil(v2.y),v4x)
- fill_tri_top(v3.x,v3.y,v2.x,flr(v2.y),v4x)
+ fill_tri_bot(v1[1],v1[2],v2[1],ceil(v2[2]),v4x)
+ fill_tri_top(v3[1],v3[2],v2[1],flr(v2[2]),v4x)
 end
 -->8
 local shades = {0,1,2,3,13,4,11,7}
@@ -280,17 +276,17 @@ function _draw()
  local t = triangle()
 
  local num_tris = #m.faces
- for f = 1,num_tris do  
+ for f = 1,num_tris do
   local face = m.faces[f]
   for i=1,3 do
    local p = t.p[i]
    local verti = face[i]
    local vert = m.vert[verti]
-	  p.x=vert[1]
-	  p.y=vert[2]
-	  p.z=vert[3]
+   p[1]=vert[1]
+   p[2]=vert[2]
+   p[3]=vert[3]
   end
-  
+
   local trirotz=triangle()
   vec3_mul(trirotz.p[1],t.p[1],matrotz)
   vec3_mul(trirotz.p[2],t.p[2],matrotz)
@@ -302,9 +298,9 @@ function _draw()
   vec3_mul(trirotzx.p[3],trirotz.p[3],matrotx)
 
   local tri_trans=triangle(trirotzx.p)
-  tri_trans.p[1].z += 7
-  tri_trans.p[2].z += 7
-  tri_trans.p[3].z += 7
+  tri_trans.p[1][3] += 7
+  tri_trans.p[2][3] += 7
+  tri_trans.p[3][3] += 7
 
   local l1 = {x=0,y=0,z=0}
   vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
@@ -324,40 +320,40 @@ function _draw()
   vec3_mul(tri_proj.p[1],tri_trans.p[1],pmat)
   vec3_mul(tri_proj.p[2],tri_trans.p[2],pmat)
   vec3_mul(tri_proj.p[3],tri_trans.p[3],pmat)
-  
+
   --move into screenspace
-  tri_proj.p[1].x+=1
-  tri_proj.p[1].y+=1
-  tri_proj.p[2].x+=1
-  tri_proj.p[2].y+=1
-  tri_proj.p[3].x+=1
-  tri_proj.p[3].y+=1
+  tri_proj.p[1][1] +=1
+  tri_proj.p[1][2] +=1
+  tri_proj.p[2][1] +=1
+  tri_proj.p[2][2] +=1
+  tri_proj.p[3][1] +=1
+  tri_proj.p[3][2] +=1
 
-  tri_proj.p[1].x *=64
-  tri_proj.p[1].y *=64
-  tri_proj.p[2].x *=64
-  tri_proj.p[2].y *=64
-  tri_proj.p[3].x *=64
-  tri_proj.p[3].y *=64
+  tri_proj.p[1][1] *=64
+  tri_proj.p[1][2] *=64
+  tri_proj.p[2][1] *=64
+  tri_proj.p[2][2] *=64
+  tri_proj.p[3][1] *=64
+  tri_proj.p[3][2] *=64
 
-		face[4] = tri_proj.p[1].z
-		face[4] += tri_proj.p[2].z
-		face[4] += tri_proj.p[3].z
-		face[4] *= 0.333333333
+  face[4] = tri_proj.p[1][3]
+  face[4] += tri_proj.p[2][3]
+  face[4] += tri_proj.p[3][3]
+  --face[4] *= 0.333333333
 
   local col = f%16
-		
-		gcx.fill = true
+
+  gcx.fill = true
   draw_tri(tri_proj, col)
-		
-		gcx.fill = false
+
+  gcx.fill = false
   draw_tri(tri_proj, 0)
-		
-		tris_drawn += 1
+
+  tris_drawn += 1
   ::draw_tri_end::
  end
 
- --sort triangles by 
+ --sort triangles by
  --distance in last frame
  qsort(m.faces, function(l,r)
   return r[4]-l[4]
