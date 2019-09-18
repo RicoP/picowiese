@@ -98,11 +98,11 @@ function vec3_mul(res, v, m)
  w += m[3][4] * v[3]
  w += m[4][4]
 
- if w != 0 then
-  res[1] /= w
-  res[2] /= w
-  res[3] /= w
- end
+ w = 1/w
+
+ res[1] *= w
+ res[2] *= w
+ res[3] *= w
 
  return res
 end
@@ -232,6 +232,14 @@ function print_stat()
  print("fps3: " .. stat(9))
 end
 
+function simple_sort(f)
+ for i=2,#f do
+  if f[i-1][4] < f[i][4] then
+   f[i-1],f[i] = f[i],f[i-1]
+  end
+ end
+end
+
 function _init()
 end
 
@@ -272,7 +280,7 @@ function _draw()
  matrotx[3][3]=cos(theta*.5)
  matrotx[4][4]=1
 
- local m = arwing_mesh
+ local m = ball_mesh
  local t = triangle()
 
  local num_tris = #m.faces
@@ -302,12 +310,12 @@ function _draw()
   tri_trans.p[2][3] += 7
   tri_trans.p[3][3] += 7
 
-  local l1 = {x=0,y=0,z=0}
+  local l1 = {0,0,0}
   vec3_sub(l1, tri_trans.p[2],tri_trans.p[1])
-  local l2 = {x=0,y=0,z=0}
+  local l2 = {0,0,0}
   vec3_sub(l2, tri_trans.p[3],tri_trans.p[2])
 
-  local n = {x=0,y=0,z=0}
+  local n = {0,0,0}
   vec3_cross(n,l1,l2)
   vec3_normalize(n)
 
@@ -336,10 +344,10 @@ function _draw()
   tri_proj.p[3][1] *=64
   tri_proj.p[3][2] *=64
 
-  face[4] = tri_proj.p[1][3]
+  face[4]  = tri_proj.p[1][3]
   face[4] += tri_proj.p[2][3]
   face[4] += tri_proj.p[3][3]
-  --face[4] *= 0.333333333
+  --face[4] /= 3
 
   local col = f%16
 
@@ -355,15 +363,11 @@ function _draw()
 
  --sort triangles by
  --distance in last frame
- qsort(m.faces, function(l,r)
-  return r[4]-l[4]
- end)
+ --qsort(m.faces, function(l,r)
+ -- return r[4]-l[4]
+ --end)
+ simple_sort(m.faces)
 
-
- --fill_tri_bott(35,10,10,20,20)
- --color(14)
- --fill_tri_top(15,30,10,20,20)
- --fill_tri({x=5,y=0},{x=0,y=30},{x=20,y=20},7)
  frame += 1
 
  print_stat()
