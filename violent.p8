@@ -410,6 +410,19 @@ function check_hero_touch(x,y,p)
  end
 end
 
+function shoot_melon(p)
+ local melon = {x=p.x, y=p.y}
+ melon.direction = p.direction
+ melon.velx = p.direction * melon_speed
+ melon.vely = 0
+ local is_other = p.tile == enemy_other
+ melon.player = not is_other
+ melon.tile = tile_melon
+ melon.lifetime = 20
+ add(entities, melon)
+ sfx(0)
+end
+
 function hero_movement(p)
  p.groundlevel = calc_char_groundlevel(p.x,p.y,8)
 
@@ -450,15 +463,7 @@ function hero_movement(p)
  
  --shootng
  if btnd(❎) then
-  local melon = {x=p.x, y=p.y}
-  melon.direction = p.direction
-  melon.velx = p.direction * melon_speed
-  melon.vely = 0
-  melon.player = true
-  melon.tile = tile_melon
-  melon.lifetime = 20
-  add(entities, melon)
-  sfx(0)
+  shoot_melon(p)
  end
 end
 
@@ -478,6 +483,11 @@ function check_spikes(p)
 end
 
 function enemy_update(e,p)
+  if e.tile == enemy_other then
+   if btnd(❎) then
+    shoot_melon(e)
+   end
+  end
   if abs(e.x-p.x) <= 8 and abs(e.y-p.y) <= 8 then
    hurt_hero(9,p)
   end
