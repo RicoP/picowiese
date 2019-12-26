@@ -117,6 +117,18 @@ function _init()
  select_level(1)
 end
 
+function item_logic(p)
+	for i,item in pairs(items) do
+  if item.tile == item_health1 then
+   if abs(item.x-p.x) <= 4 and abs(item.y-p.y) <= 8 then
+    p1.health += 20
+    del(items, item) 
+    sfx(2)
+   end
+  end
+ end
+end
+
 function _update()
  --if (g_frame % 4) != 0 then return end
  
@@ -126,21 +138,13 @@ function _update()
  btn_update()
 
  --item logic
- for i,item in pairs(items) do
-  if item.tile == item_health1 then
-   if abs(item.x-p.x) <= 4 and abs(item.y-p.y) <= 8 then
-    p1.health += 20
-    del(items, item) 
-    sfx(2)
-   end
-  end
- end
+ item_logic(p1)
  
  --enemy logic
  for e in all(enemies) do
-  enemy_update(e)
+  enemy_update(e,p1)
   if e.tile == tile_turret then
-   turret_logic(e)
+   turret_logic(e,p1)
   end
  end
  
@@ -150,7 +154,7 @@ function _update()
  end
 
  if g_state == g_state_run then
-	 p.state = p_state_stand 
+	 p1.state = p_state_stand 
 	 hero_movement(p1)
  end
  
@@ -176,7 +180,7 @@ function _update()
 end
 
 function _draw()
- local camx=p.x - 32
+ local camx=p1.x - 32
  local camy=flr(p1.y/128)*128
  if camx < 0 then camx=0 end
  camera(camx, camy)
@@ -192,7 +196,7 @@ function _draw()
 
  for e in all(enemies) do
   if e.tile == tile_turret then
-   turret_draw(e)
+   turret_draw(e,p1)
   else
    enemy_draw(e)
   end
@@ -216,10 +220,10 @@ function _draw()
  camera()
 
  --ui
- draw_healthbar()
+ draw_healthbar(p1)
 
  for i = 1,15 do
-  local g = calc_char_groundlevel(p.x,8*i,8)
+  local g = calc_char_groundlevel(p1.x,8*i,8)
   --line(0, g, 128, g, i)
  end
 
@@ -267,20 +271,20 @@ function calc_char_groundlevel(x,y,w)
  return min(g0,g1)
 end
 
-function hurt_hero(damage)
+function hurt_hero(damage, p)
  if p.iframes > 0 then return end
  p.stuned = 30
  p.iframes = 60
  p.health -= damage
  p.health = clamp(p.health,0,100)
  if p.health == 0 then
-  kill_hero()
+  kill_hero(p)
  else
   sfx(1)
  end
 end
 
-function kill_hero()
+function kill_hero(p)
  g_state = g_state_dead
  timer_reset()
  
@@ -302,12 +306,12 @@ function kill_hero()
  end
 end
 
-function heal_hero(healing)
+function heal_hero(healing, p)
  p.health += healing
 end
 -->8
 -- movement functions
-function apply_hero_falling()
+function apply_hero_falling(p)
  if p.y < p.groundlevel then
   p.jumpvel += 0.5
  end
@@ -324,7 +328,7 @@ function apply_hero_falling()
  end
 end
 
-function apply_hero_jumping()
+function apply_hero_jumping(p)
  if p.jumpvel >= 0 then return end
 
  --print("jumping")
@@ -360,7 +364,7 @@ function apply_hero_jumping()
  end
 end
 
-function apply_hero_movement()
+function apply_hero_movement(p)
  local direction = p.direction
  if p.stuned != 0 then
   direction = -direction / 2
@@ -382,18 +386,18 @@ function apply_hero_movement()
  p.x = x1
 end
 
-function check_hero_touch(x,y)
+function check_hero_touch(x,y,p)
  local t = mget(x/8,y/8)
  
  if p.iframes == 0 and fget(t, flag_instadeath) then
-  --kill_hero()
+  --kill_hero(p)
  end
  if p.iframes == 0 and fget(t, flag_hurt) then
-  hurt_hero(20)
+  hurt_hero(20,p)
  end
 end
 
-function hero_movement()
+function hero_movement(p)
  p.groundlevel = calc_char_groundlevel(p.x,p.y,8)
 
  if p.health == 0 then return end
@@ -411,9 +415,9 @@ function hero_movement()
  end 
 
  local oldx = p.x
- apply_hero_falling()
- apply_hero_jumping()
- apply_hero_movement()
+ apply_hero_falling(p)
+ apply_hero_jumping(p)
+ apply_hero_movement(p)
 
  if oldx == p.x then
   p.state = p_state_stand
@@ -423,13 +427,13 @@ function hero_movement()
  if p.stuned > 0 then p.stuned -= 1 end
  
  if p.state != p_state_jump then 
-  check_hero_touch(p.x,p.y+8)
-  check_hero_touch(p.x+8,p.y+8)
-  check_hero_touch(p.x,p.y)
-  check_hero_touch(p.x+7,p.y)
+  check_hero_touch(p.x,p.y+8,p)
+  check_hero_touch(p.x+8,p.y+8,p)
+  check_hero_touch(p.x,p.y,p)
+  check_hero_touch(p.x+7,p.y,p)
  end
  
- check_spikes()
+ check_spikes(p)
  
  --shootng
  if btnd(❎) then
@@ -445,24 +449,24 @@ function hero_movement()
  end
 end
 
-function check_spikes()
-	local check_hero_touch=function(x,y)
+function check_spikes(p)
+	local check_hero_touch=function(x,y,p)
 	 local t = mget(x/8,y/8)
 	 
 	 if fget(t, flag_instadeath) then
-	  kill_hero()
+	  kill_hero(p)
 	 end
 	end
 
  if p.state != p_state_jump then 
-  check_hero_touch(p.x,p.y)
-  check_hero_touch(p.x+8,p.y)
+  check_hero_touch(p.x,p.y,p)
+  check_hero_touch(p.x+8,p.y,p)
  end 
 end
 
-function enemy_update(e)
+function enemy_update(e,p)
   if abs(e.x-p.x) <= 8 and abs(e.y-p.y) <= 8 then
-   hurt_hero(9)
+   hurt_hero(9,p)
   end
 
 	 if e.velx and e.vely then
@@ -521,7 +525,7 @@ end
 
 -->8
 -- draw functions
-function hero_draw()
+function hero_draw(p)
  if p.health == 0 then return end
  if p.iframes > 0 and (g_frame % 2) == 0 then
   return
@@ -552,7 +556,7 @@ function hero_draw()
  pal(9,9)
 end
 
-function draw_healthbar()
+function draw_healthbar(p)
  local h = 20
  for y=0,h do
   local c
@@ -606,7 +610,7 @@ end
 --turret
 tile_turret = 13
 
-function turret_shoot(t)
+function turret_shoot(t,p)
 	local e = {}
 	e.x,e.y = t.x,t.y
  e.velx = (p.x-t.x)/20
@@ -617,10 +621,9 @@ function turret_shoot(t)
 	e.tile = entity_explosion1
 	e.lifetime = 60
 	add(enemies,e)  
-
 end
 
-function turret_logic(e)
+function turret_logic(e,p)
  local range = 45
  local s = e.state
  
@@ -640,14 +643,14 @@ function turret_logic(e)
 
  if s == "attacking" then  
   if g_frame % 50 == 0 then
-   turret_shoot(e)
+   turret_shoot(e,p)
   end
  end
  
  e.state = s
 end
 
-function turret_draw(e)
+function turret_draw(e,p)
  local t = e.tile
  local s = e.state
  local hz = 20 
