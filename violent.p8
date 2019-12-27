@@ -510,9 +510,11 @@ function enemy_update(e,p)
   if e.iframes == 0 then
 	  for m in all(entities) do
 	   if m.tile == tile_melon and abs(e.x-m.x) < 6 and abs(e.y-m.y) < 8 then
-	    e.health -= 20
-	    e.iframes = 10
-	    del(entities,m)
+	    if m.player then
+	     e.health -= 20
+	     e.iframes = 10
+	     del(entities,m)
+	    end
 	   end
 	  end
 	 else
@@ -537,6 +539,12 @@ function entity_update(e)
    del(entities,e)
   end
  end
+ if abs(e.x-p1.x) <= 8 and abs(e.y-p1.y) <= 8 then
+  if e.tile == tile_melon and not e.player then
+   hurt_hero(9,p1)
+  end
+ end
+
 end
 
 function create_item(t, x, y)
