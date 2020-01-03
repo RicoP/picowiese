@@ -19,7 +19,7 @@ enemy_other = 80
 tile_exit = 51
 
 --player
-p1 = {}
+h = {}
 p_state_stand = 1
 p_state_jump = 2
 p_state_run = 3
@@ -74,6 +74,12 @@ function clamp(v, mi, ma)
 end
 
 function _init()
+ menuitem(1, "kill hero", function() kill_hero(h) end)
+ menuitem(2, "restart", function() init_game() end)
+ init_game()
+end
+
+function init_game()
  level = 1
  for y = 0,63 do
   for x = 0,127 do
@@ -134,7 +140,7 @@ function item_logic(p)
 	for i,item in pairs(items) do
   if item.tile == item_health1 then
    if abs(item.x-p.x) <= 4 and abs(item.y-p.y) <= 8 then
-    p1.health += 20
+    h.health += 20
     del(items, item) 
     sfx(2)
    end
@@ -151,13 +157,13 @@ function _update()
  btn_update()
 
  --item logic
- item_logic(p1)
+ item_logic(h)
  
  --enemy logic
  for e in all(enemies) do
-  enemy_update(e,p1)
+  enemy_update(e,h)
   if e.tile == tile_turret then
-   turret_logic(e,p1)
+   turret_logic(e,h)
   end
  end
  
@@ -167,34 +173,20 @@ function _update()
  end
 
  if g_state == g_state_run then
-	 p1.state = p_state_stand 
-	 hero_movement(p1)
+	 h.state = p_state_stand 
+	 hero_movement(h)
  end
  
  if g_state == g_state_dead then
   if frame() == 60 then
    select_level(level)
   end
- end
- 
- color(13)
- --print(#entities)
- --print(p.groundlevel)
- --print(p.x .. " " .. p.y)
- --print(p.health)
- --print(p.jumpvel)
- 
- for e in all(enemies) do
-  if e.tile == tile_turret then
-   print(e.state)
-  end
- end
-  
+ end 
 end
 
 function _draw()
- local camx=p1.x - 32
- local camy=flr(p1.y/128)*128
+ local camx=h.x - 32
+ local camy=flr(level+1/128)*128
  if camx < 0 then camx=0 end
  camera(camx, camy)
 
@@ -209,7 +201,7 @@ function _draw()
 
  for e in all(enemies) do
   if e.tile == tile_turret then
-   turret_draw(e,p1)
+   turret_draw(e,h)
   else
    enemy_draw(e)
   end
@@ -219,7 +211,7 @@ function _draw()
   entity_draw(e)
  end
 
- hero_draw(p1)
+ hero_draw(h)
  
  palt(0, true)
  palt(14, false)
@@ -233,14 +225,30 @@ function _draw()
  camera()
 
  --ui
- draw_healthbar(p1)
+ draw_healthbar(h)
 
  for i = 1,15 do
-  local g = calc_char_groundlevel(p1.x,8*i,8)
+  local g = calc_char_groundlevel(h.x,8*i,8)
   --line(0, g, 128, g, i)
  end
 
  g_frame = g_frame + 1
+
+
+ color(13)
+ cursor()
+ print(#entities)
+ print(h.groundlevel)
+ print(h.x .. " " .. h.y)
+ print(h.health)
+ print(h.jumpvel)
+ 
+ for e in all(enemies) do
+  if e.tile == tile_turret then
+   print(e.state)
+  end
+ end
+ 
 end
 
 -->8
@@ -251,7 +259,7 @@ end
 
 function select_level(l)
  level = l
- p1 = cstr_player(levels[l].x,levels[l].y)
+ h = cstr_player(levels[l].x,levels[l].y)
  g_state = g_state_run
  g_frame = 0
 end
@@ -415,8 +423,7 @@ function shoot_melon(p)
  melon.direction = p.direction
  melon.velx = p.direction * melon_speed
  melon.vely = 0
- local is_other = p.tile == enemy_other
- melon.player = not is_other
+ melon.shooter = p
  melon.tile = tile_melon
  melon.lifetime = 20
  add(entities, melon)
@@ -510,7 +517,7 @@ function enemy_update(e,p)
   if e.iframes == 0 then
 	  for m in all(entities) do
 	   if m.tile == tile_melon and abs(e.x-m.x) < 6 and abs(e.y-m.y) < 8 then
-	    if m.player then
+	    if m.shooter == h then
 	     e.health -= 20
 	     e.iframes = 10
 	     del(entities,m)
@@ -539,9 +546,9 @@ function entity_update(e)
    del(entities,e)
   end
  end
- if abs(e.x-p1.x) <= 8 and abs(e.y-p1.y) <= 8 then
-  if e.tile == tile_melon and not e.player then
-   hurt_hero(9,p1)
+ if abs(e.x-h.x) <= 8 and abs(e.y-h.y) <= 8 then
+  if e.tile == tile_melon and e.shooter != h then
+   hurt_hero(9,h)
   end
  end
 
